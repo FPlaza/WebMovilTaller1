@@ -12,4 +12,28 @@
     <p>Aquí va la información sobre música.</p>
 </body>
 
+<div class="musica-cantantes" id="musica-cantantes"></div>
+
+<script>
+    async function cargarMusica(){
+        const cantantes = ["Pink Floyd", "Queen", "Adele", "Coldplay"];
+        const lista = document.getElementById("musica-cantantes");
+
+        for(const cantante of cantantes){
+            const res = await fetch(`https://www.theaudiodb.com/api/v1/json/123/search.php?s=${encodeURIComponent(cantante)}`);
+            const data = await res.json();
+
+            const c1 = data.artists[0];
+            lista.innerHTML += `
+                <div class="cantante">
+                    <h2>${c1.strArtist}</h2>
+                    <img src="${c1.strArtistThumb}" alt="${c1.strArtist}" width="200">
+                    <p><strong>Género:</strong> ${c1.strGenre}</p>
+                </div>
+            `;
+        }
+    }
+    cargarMusica();
+</script>
+
 </html>
