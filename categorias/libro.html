@@ -12,4 +12,30 @@
     <p>Aquí va la información sobre libros.</p>
 </body>
 
+<div class="libros-biblio" id="libros-biblio"></div>
+
+<script>
+    const libros = ["El Quijote", "Cien años de soledad", "Don Juan Tenorio", "La casa de los espíritus"];
+
+    async function cargarLibros(){
+        const lista = document.getElementById("libros-biblio");
+
+        for(const libro of libros){
+            const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(libro)}`);
+            const data = await res.json();
+            
+            const l1 = data.docs[0];
+            lista.innerHTML += `
+                <div class="libro">
+                    <h2>${l1.title}</h2>
+                    <img src="https://covers.openlibrary.org/b/id/${l1.cover_i}-M.jpg" alt="${l1.title}" width="200">
+                    <p><strong>Autor:</strong> ${l1.author_name.join(", ")}</p>
+                    <p><strong>Año de publicación:</strong> ${l1.first_publish_year}</p>
+                </div>
+            `;
+        }
+    }
+    cargarLibros();
+</script>
+
 </html>
