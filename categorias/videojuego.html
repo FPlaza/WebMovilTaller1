@@ -12,19 +12,4 @@
     <p>Aquí va la información sobre videojuegos.</p>
 </body>
 
-<ul id="api-videojuegos"></ul>
-
-<script>
-     async function cargarVideojuegos(){
-    const res = await fetch("");
-    const data = await res.json();
-
-    const lista = document.getElementById("usuarios");
-    lista.innerHTML = data
-        .map(u => `<li>${u.name}(${u.email})</li>`)
-        .join("");
-    }
-    cargarVideojuegos();
-</script>
-
 </html>

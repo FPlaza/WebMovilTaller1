@@ -12,4 +12,31 @@
     <p>Aquí va la información sobre películas.</p>
 </body>
 
+<div class="peliculas-omdb" id="peliculas-omdb"></div>
+
+<script>
+    const API_KEY = "b25d9640";
+    const peliculas = ["Inception", "Interstellar", "Dunkirk", "Tenet"];
+    
+    async function cargarPeliculas(){
+        const lista = document.getElementById("peliculas-omdb");
+
+        for(const pelicula of peliculas){
+            const res = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(pelicula)}&apikey=${API_KEY}`);
+            const data = await res.json();
+
+            lista.innerHTML += `
+                <div class="pelicula">
+                    <h2>${data.Title}</h2>
+                    <img src="${data.Poster}" alt="${data.Title}" width="200">
+                    <p><strong>Año:</strong> ${data.Year}</p>
+                    <p><strong>Director:</strong> ${data.Director}</p>
+                    <p><strong>Género:</strong> ${data.Genre}</p>
+                </div>
+            `;
+        }
+    }
+    cargarPeliculas();
+</script>
+
 </html>
