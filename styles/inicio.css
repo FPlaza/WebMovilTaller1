@@ -19,24 +19,39 @@
     justify-content: space-between;
 }
 /* ------------------------------------------- */
+.contenedor-categorias {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 80px;
+    align-items: stretch;
+    max-width: 800px;
+    margin: 50px auto;
+}
+
+.contenedor-categorias div {
+    display: flex;
+    flex-direction: column;
+    height:450px;
+    margin: 0;
+    border-radius: 15px;
+}
+
+.contenedor-categorias img {
+    width: 100%;
+    height: 250px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+/* ------------------------------------------- */
 .cuadro-videojuegos {
     background: #7C038C;
-    border-radius: 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     max-width: 400px;
-    margin: 20px auto;
 }
 
 .cuadro-videojuegos:hover {
     transform: translate(5px, -5px);
     transition: transform 0.7s;
-}
-
-.cuadro-videojuegos img {
-    width: 100%;
-    height: 250px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
 }
 
 .info-videojuegos {
@@ -46,22 +61,13 @@
 /* ------------------------------------------- */
 .cuadro-musica {
     background: #D96ABB;
-    border-radius: 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     max-width: 400px;
-    margin: 20px auto;
 }
 
 .cuadro-musica:hover {
     transform: translate(5px, -5px);
     transition: transform 0.7s;
-}
-
-.cuadro-musica img {
-    width: 100%;
-    height: 250px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
 }
 
 .info-musica {
@@ -71,22 +77,13 @@
 /* ------------------------------------------- */
 .cuadro-peliculas {
     background: #D94A56;
-    border-radius: 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     max-width: 400px;
-    margin: 20px auto;
 }
 
 .cuadro-peliculas:hover {
     transform: translate(5px, -5px);
     transition: transform 0.7s;
-}
-
-.cuadro-peliculas img {
-    width: 100%;
-    height: 250px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
 }
 
 .info-peliculas {
@@ -96,22 +93,13 @@
 /* ------------------------------------------- */
 .cuadro-libros {
     background: #D9BD9C;
-    border-radius: 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     max-width: 400px;
-    margin: 20px auto;
 }
 
 .cuadro-libros:hover {
     transform: translate(5px, -5px);
     transition: transform 0.7s;
-}
-
-.cuadro-libros img {
-    width: 100%;
-    height: 250px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
 }
 
 .info-libros {
