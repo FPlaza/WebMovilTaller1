@@ -157,7 +157,6 @@ function loadSampleData() {
     renderGames();
 }
 
-// Event listeners
 filterBtn.addEventListener('click', filterGames);
 platformFilter.addEventListener('change', filterGames);
 genreFilter.addEventListener('change', filterGames);
