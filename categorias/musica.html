@@ -5,35 +5,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Música</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <h1>Música</h1>
-    <p>Aquí va la información sobre música.</p>
-</body>
+<body class="bg-gray-900 text-white font-sans text-center">
+    <div class="bg-pink-700 py-6">
+        <h1 class="text-3xl font-bold">TOP MÚSICA</h1>
+        <div class="mt-2">
+            <a href="../index.html"
+                class="inline-block bg-purple-700 px-4 py-2 rounded hover:bg-purple-800 transition">Página principal</a>
+        </div>
+    </div>
 
-<div class="musica-cantantes" id="musica-cantantes"></div>
+    <div class="my-6 flex justify-center gap-2">
+        <input id="busqueda" type="text" placeholder="Buscar artistas..."
+            class="px-3 py-2 rounded focus:outline-none text-black w-64">
+        <button onclick="buscarArtistas()"
+            class="bg-purple-700 px-4 py-2 rounded hover:bg-purple-800 transition">Buscar</button>
+    </div>
 
-<script>
-    async function cargarMusica(){
-        const cantantes = ["Pink Floyd", "Queen", "Adele", "Coldplay"];
-        const lista = document.getElementById("musica-cantantes");
+    <div id="contenedor-artistas" class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-5xl mx-auto mb-10"></div>
 
-        for(const cantante of cantantes){
-            const res = await fetch(`https://www.theaudiodb.com/api/v1/json/123/search.php?s=${encodeURIComponent(cantante)}`);
+    <script>
+        async function cargarArtistas() {
+            const artistas = ["Pink Floyd", "Queen", "Adele", "Coldplay"];
+            mostrarArtistas(artistas);
+        }
+
+        async function mostrarArtistas(listaArtistas) {
+            const contenedor = document.getElementById("contenedor-artistas");
+            contenedor.innerHTML = "";
+
+            for (const artista of listaArtistas) {
+                const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artista)}`);
+                const data = await res.json();
+
+                const a = data.artists[0];
+                contenedor.innerHTML += `
+                <div class="bg-purple-800 rounded-lg overflow-hidden text-center transform hover:translate-x-1 hover:-translate-y-1 transition cursor-pointer">
+                    <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${a.strArtist}">
+                    <div class="p-4">
+                <h2 class="text-xl font-semibold">${a.strArtist}</h2>
+                <p class="mt-1">Género: ${a.strGenre}</p>
+              </div>
+                </div>
+                `;
+            }
+        }
+
+        async function buscarArtistas() {
+            const busqueda = document.getElementById("busqueda").value.trim();
+            if (busqueda === "") {
+                cargarArtistas();
+                return;
+            }
+
+            const contenedor = document.getElementById("contenedor-artistas");
+            contenedor.innerHTML = "";
+
+            const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(busqueda)}`);
             const data = await res.json();
 
-            const c1 = data.artists[0];
-            lista.innerHTML += `
-                <div class="cantante">
-                    <h2>${c1.strArtist}</h2>
-                    <img src="${c1.strArtistThumb}" alt="${c1.strArtist}" width="200">
-                    <p><strong>Género:</strong> ${c1.strGenre}</p>
-                </div>
-            `;
+            if (data.artists) {
+                mostrarArtistas([data.artists[0].strArtist]);
+            }
         }
-    }
-    cargarMusica();
-</script>
+        cargarArtistas();
+    </script>
+
+</body>
 
 </html>
