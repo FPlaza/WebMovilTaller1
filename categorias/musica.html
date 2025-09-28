@@ -4,75 +4,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Música</title>
+    <title>Música - 4GEEK</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-blue': '#3B82F6',
+                        'custom-purple': '#8B5CF6'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body class="bg-gray-900 text-white font-sans text-center">
-    <div class="bg-pink-700 py-6">
-        <h1 class="text-3xl font-bold">TOP MÚSICA</h1>
-        <div class="mt-2">
-            <a href="../index.html"
-                class="inline-block bg-purple-700 px-4 py-2 rounded hover:bg-purple-800 transition">Página principal</a>
+<body class="bg-gray-900 text-white font-sans min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-custom-blue to-custom-purple text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                <img src="../img/4GEEK.png" alt="Logo" class="w-12 h-12">
+                <h1 class="text-2xl font-bold">4GEEK</h1>
+            </div>
+            <nav class="flex space-x-4">
+                <a href="../index.html" class="hover:bg-white/20 px-3 py-2 rounded transition">Inicio</a>
+            </nav>
         </div>
-    </div>
+    </header>
 
-    <div class="my-6 flex justify-center gap-2">
-        <input id="busqueda" type="text" placeholder="Buscar artistas..."
-            class="px-3 py-2 rounded focus:outline-none text-black w-64">
-        <button onclick="buscarArtistas()"
-            class="bg-purple-700 px-4 py-2 rounded hover:bg-purple-800 transition">Buscar</button>
-    </div>
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2">TOP MÚSICA</h1>
+        <p class="text-lg text-center text-gray-400 mb-8">Descubre información sobre tus artistas favoritos</p>
 
-    <div id="contenedor-artistas" class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-5xl mx-auto mb-10"></div>
+        <div class="flex flex-col md:flex-row justify-center gap-3 md:gap-4 mx-auto my-8 max-w-2xl px-4">
+            <input id="busqueda" type="text" placeholder="Buscar artistas..."
+                class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-custom-blue text-black">
+            <button onclick="buscarArtistas()"
+                class="px-6 md:px-8 py-3 bg-custom-purple border-0 rounded-lg text-base cursor-pointer hover:bg-purple-700 transition-colors font-medium">
+                Buscar
+            </button>
+        </div>
+
+        <div id="contenedor-artistas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-10"></div>
+    </main>
 
     <script>
         async function cargarArtistas() {
-            const artistas = ["Pink Floyd", "Queen", "Adele", "Coldplay"];
+            const artistas = ["Pink Floyd", "Queen", "Adele", "Coldplay", "The Beatles", "Taylor Swift", "Bad Bunny", "Ed Sheeran"];
             mostrarArtistas(artistas);
         }
 
         async function mostrarArtistas(listaArtistas) {
             const contenedor = document.getElementById("contenedor-artistas");
-            contenedor.innerHTML = "";
+            contenedor.innerHTML = '<div class="col-span-3 text-center py-8"><div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-custom-purple"></div><p class="mt-2 text-gray-400">Cargando artistas...</p></div>';
 
+            const artistasData = [];
+            
             for (const artista of listaArtistas) {
-                const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artista)}`);
-                const data = await res.json();
+                try {
+                    const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artista)}`);
+                    const data = await res.json();
 
-                const a = data.artists[0];
+                    if (data.artists && data.artists[0]) {
+                        artistasData.push(data.artists[0]);
+                    }
+                } catch (error) {
+                    console.error(`Error cargando ${artista}:`, error);
+                }
+            }
+
+            contenedor.innerHTML = "";
+            
+            if (artistasData.length === 0) {
+                contenedor.innerHTML = '<div class="col-span-3 text-center py-8"><p class="text-gray-400">No se encontraron artistas</p></div>';
+                return;
+            }
+
+            artistasData.forEach(a => {
                 contenedor.innerHTML += `
-                <div class="bg-purple-800 rounded-lg overflow-hidden text-center transform hover:translate-x-1 hover:-translate-y-1 transition cursor-pointer">
-                    <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${a.strArtist}">
+                <div class="bg-gray-800 rounded-lg overflow-hidden text-center transform hover:translate-y-1 transition duration-300 cursor-pointer">
+                    <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200/374151/9CA3AF?text=No+Image'}" 
+                         alt="${a.strArtist}" 
+                         class="w-full h-48 object-cover">
                     <div class="p-4">
-                <h2 class="text-xl font-semibold">${a.strArtist}</h2>
-                <p class="mt-1">Género: ${a.strGenre}</p>
-              </div>
+                        <h2 class="text-xl font-semibold mb-2">${a.strArtist}</h2>
+                        <p class="text-gray-400 mb-1"><strong>Género:</strong> ${a.strGenre || 'No disponible'}</p>
+                        <p class="text-gray-400 mb-1"><strong>País:</strong> ${a.strCountry || 'No disponible'}</p>
+                        <p class="text-gray-400"><strong>Año:</strong> ${a.intFormedYear || 'No disponible'}</p>
+                    </div>
                 </div>
                 `;
-            }
+            });
         }
 
         async function buscarArtistas() {
             const busqueda = document.getElementById("busqueda").value.trim();
+            const contenedor = document.getElementById("contenedor-artistas");
+
             if (busqueda === "") {
                 cargarArtistas();
                 return;
             }
 
-            const contenedor = document.getElementById("contenedor-artistas");
-            contenedor.innerHTML = "";
+            contenedor.innerHTML = '<div class="col-span-3 text-center py-8"><div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-custom-purple"></div><p class="mt-2 text-gray-400">Buscando artistas...</p></div>';
 
-            const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(busqueda)}`);
-            const data = await res.json();
+            try {
+                const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(busqueda)}`);
+                const data = await res.json();
 
-            if (data.artists) {
-                mostrarArtistas([data.artists[0].strArtist]);
+                contenedor.innerHTML = "";
+
+                if (data.artists) {
+                    data.artists.slice(0, 9).forEach(artista => {
+                        contenedor.innerHTML += `
+                        <div class="bg-gray-800 rounded-lg overflow-hidden text-center transform hover:translate-y-1 transition duration-300 cursor-pointer">
+                            <img src="${artista.strArtistThumb || 'https://via.placeholder.com/300x200/374151/9CA3AF?text=No+Image'}" 
+                                 alt="${artista.strArtist}" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <h2 class="text-xl font-semibold mb-2">${artista.strArtist}</h2>
+                                <p class="text-gray-400 mb-1"><strong>Género:</strong> ${artista.strGenre || 'No disponible'}</p>
+                                <p class="text-gray-400 mb-1"><strong>País:</strong> ${artista.strCountry || 'No disponible'}</p>
+                                <p class="text-gray-400"><strong>Año:</strong> ${artista.intFormedYear || 'No disponible'}</p>
+                            </div>
+                        </div>
+                        `;
+                    });
+                } else {
+                    contenedor.innerHTML = '<div class="col-span-3 text-center py-8"><p class="text-gray-400">No se encontraron artistas</p></div>';
+                }
+            } catch (error) {
+                console.error('Error buscando artistas:', error);
+                contenedor.innerHTML = '<div class="col-span-3 text-center py-8"><p class="text-red-400">Error al buscar artistas</p></div>';
             }
         }
+
+        // Buscar al presionar Enter
+        document.getElementById('busqueda').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buscarArtistas();
+            }
+        });
+
         cargarArtistas();
     </script>
-
 </body>
-
 </html>

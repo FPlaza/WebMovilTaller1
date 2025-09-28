@@ -5,12 +5,12 @@ const gamesList = document.getElementById('lista-videojuegos');
 const platformFilter = document.getElementById('filtro-plataforma');
 const genreFilter = document.getElementById('filtro-genero');
 const filterBtn = document.getElementById('btn-filtrar');
+const searchInput = document.getElementById('busqueda');
 
 let allGames = [];
 let filteredGames = [];
 let platforms = [];
 let genres = [];
-
 
 window.addEventListener('load', function() {
     loadGames();
@@ -51,18 +51,19 @@ async function loadGames() {
     } catch (err) {
         console.log('Error cargando datos:', err);
         document.getElementById('error').textContent = 'Error al cargar. Usando datos de ejemplo...';
+        document.getElementById('error').classList.remove('hidden');
         document.getElementById('cargando').classList.add('hidden');
         loadSampleData();
     }
 }
 
 function updateFilters() {
-    platformFilter.innerHTML = '<option value="">Todas</option>';
+    platformFilter.innerHTML = '<option value="">Todas las plataformas</option>';
     platforms.forEach(platform => {
         platformFilter.innerHTML += `<option value="${platform}">${platform}</option>`;
     });
     
-    genreFilter.innerHTML = '<option value="">Todos</option>';
+    genreFilter.innerHTML = '<option value="">Todos los géneros</option>';
     genres.forEach(genre => {
         genreFilter.innerHTML += `<option value="${genre}">${genre}</option>`;
     });
@@ -70,7 +71,7 @@ function updateFilters() {
 
 function renderGames() {
     if (filteredGames.length === 0) {
-        gamesList.innerHTML = '<p>No hay juegos con esos filtros</p>';
+        gamesList.innerHTML = '<div class="col-span-3 text-center py-8"><p class="text-gray-600">No se encontraron videojuegos con esos filtros</p></div>';
         return;
     }
     
@@ -88,12 +89,8 @@ function renderGames() {
                     <p><span class="font-semibold">Género:</span> ${game.genre}</p>
                     <p><span class="font-semibold">Plataformas:</span> ${game.platforms.join(', ')}</p>
                     <p><span class="font-semibold">Lanzamiento:</span> ${game.released}</p>
+                    <p><span class="font-semibold">Rating:</span> ${game.rating}/5</p>
                 </div>
-                
-                <a href="${game.game_url}" target="_blank" 
-                   class="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-4 rounded font-medium transition duration-200">
-                    Jugar gratis
-                </a>
             </div>
         </div>
     `).join('');
@@ -112,14 +109,30 @@ function filterGames() {
     renderGames();
 }
 
+function buscarVideojuegos() {
+    const busqueda = searchInput.value.toLowerCase().trim();
+    
+    if (busqueda === '') {
+        filteredGames = allGames.slice();
+        renderGames();
+        return;
+    }
+    
+    filteredGames = allGames.filter(game => 
+        game.name.toLowerCase().includes(busqueda)
+    );
+    
+    renderGames();
+}
+
 function loadSampleData() {
     allGames = [
         {
             name: "Valorant",
             genre: "Shooter",
             platforms: ["PC"],
-            image: "valorant.jpg",
-            description: "Shooter táctico 5v5",
+            image: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Valorant",
+            description: "Shooter táctico 5v5 de Riot Games",
             released: "2020-06-02",
             rating: "4.6",
             game_url: "https://playvalorant.com/" 
@@ -128,8 +141,8 @@ function loadSampleData() {
             name: "League of Legends", 
             genre: "MOBA",
             platforms: ["PC"],
-            image: "lol.jpg",
-            description: "MOBA popular",
+            image: "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=LoL",
+            description: "MOBA popular desarrollado por Riot Games",
             released: "2009-10-27",
             rating: "4.7",
             game_url: "https://www.leagueoflegends.com/" 
@@ -144,6 +157,12 @@ function loadSampleData() {
     renderGames();
 }
 
+// Event listeners
 filterBtn.addEventListener('click', filterGames);
 platformFilter.addEventListener('change', filterGames);
 genreFilter.addEventListener('change', filterGames);
+searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        buscarVideojuegos();
+    }
+});
