@@ -1,30 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles/pelicula.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Películas</title>
+    <style>
+        /* Mobile First - Estilos base para móvil */
+        .pelicula-card {
+            transition: all 0.3s ease;
+        }
+        
+        .pelicula-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Media Queries para pantallas más grandes */
+        @media (min-width: 640px) {
+            .sm\:grid-cols-1 {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .md\:text-5xl {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
 </head>
 
-<body>
-    <div class="cuadro-peliculas-header">
-        <h1>Películas</h1>
-    </div>
-    <div class="filtros-barra">
-        <input type="text" id="busqueda" placeholder="Buscar por nombre...">
-        <button id="btn-generos">Géneros</button>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-[#D94A56] text-white py-6 md:py-8 text-center shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl md:text-5xl font-bold font-sans">Películas</h1>
+            <p class="mt-2 text-lg opacity-90">Explora nuestro catálogo y encuentra tus películas favoritas</p>
+        </div>
+    </header>
+
+    <!-- Barra de filtros -->
+    <div class="container mx-auto px-4 mt-6">
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+            <input 
+                type="text" 
+                id="busqueda" 
+                placeholder="Buscar por nombre..." 
+                class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D94A56] focus:border-transparent"
+            >
+            <button 
+                id="btn-generos" 
+                class="bg-[#D94A56] text-white px-6 py-3 rounded-lg hover:bg-[#b03a44] transition-colors font-medium"
+            >
+                Géneros
+            </button>
+        </div>
+
+        <!-- Lista de géneros -->
+        <div id="lista-generos" class="hidden bg-white p-4 rounded-lg shadow-md mb-6">
+            <!-- Los géneros se cargarán dinámicamente -->
+        </div>
     </div>
 
-    <div id="lista-generos"></div>
+    <!-- Contenedor de películas -->
+    <main class="container mx-auto px-4 mb-8">
+        <div id="peliculas-omdb" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Las películas se cargarán aquí -->
+        </div>
+    </main>
 
-    <div class="peliculas-contenedor" id="peliculas-omdb"> </div>
-
-    <div class="botton-container">
-        <button onclick="location.href='../index.html'">Volver al inicio</button>
+    <!-- Botón volver -->
+    <div class="container mx-auto px-4 text-center mb-8">
+        <button 
+            onclick="location.href='../index.html'" 
+            class="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+        >
+            Volver al inicio
+        </button>
     </div>
-    
+
     <script>
         const API_KEY = "b25d9640";
         let todasLasPeliculas = [];
@@ -32,36 +96,46 @@
 
         async function cargarPeliculas() {
             const lista = document.getElementById("peliculas-omdb");
-            lista.innerHTML = "<p>Cargando películas...</p>";
+            lista.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D94A56] mx-auto"></div>
+                    <p class="mt-4 text-gray-600">Cargando películas...</p>
+                </div>
+            `;
 
             const busquedas = ["action", "drama", "comedy", "adventure", "thriller"];
             
-            
-            for (const termino of busquedas) {
-                const res = await fetch(`https://www.omdbapi.com/?s=${termino}&apikey=${API_KEY}`);
-                const data = await res.json();
-                
-                if (data.Response === "True") {
-                    for (const pelicula of data.Search) {
-                        const detalleRes = await fetch(`https://www.omdbapi.com/?i=${pelicula.imdbID}&apikey=${API_KEY}`);
-                        const detalleData = await detalleRes.json();
-                        
-                        if (detalleData.Response === "True") {
-                            todasLasPeliculas.push(detalleData);
+            try {
+                for (const termino of busquedas) {
+                    const res = await fetch(`https://www.omdbapi.com/?s=${termino}&apikey=${API_KEY}`);
+                    const data = await res.json();
+                    
+                    if (data.Response === "True") {
+                        for (const pelicula of data.Search.slice(0, 3)) { // Limitar a 3 por categoría
+                            const detalleRes = await fetch(`https://www.omdbapi.com/?i=${pelicula.imdbID}&apikey=${API_KEY}`);
+                            const detalleData = await detalleRes.json();
+                            
+                            if (detalleData.Response === "True") {
+                                todasLasPeliculas.push(detalleData);
+                            }
                         }
                     }
                 }
-            }
-            
-            todasLasPeliculas = todasLasPeliculas.filter((pelicula, index, self) => 
-                index === self.findIndex(p => p.imdbID === pelicula.imdbID)
-            );
-            
-            extraerGeneros();
-            
-            mostrarPeliculas(todasLasPeliculas);
                 
-
+                todasLasPeliculas = todasLasPeliculas.filter((pelicula, index, self) => 
+                    index === self.findIndex(p => p.imdbID === pelicula.imdbID)
+                );
+                
+                extraerGeneros();
+                mostrarPeliculas(todasLasPeliculas);
+                
+            } catch (error) {
+                lista.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-red-500">Error al cargar las películas</p>
+                    </div>
+                `;
+            }
         }
 
         function extraerGeneros() {
@@ -79,7 +153,6 @@
             });
             
             generosUnicos.sort();
-            
             mostrarBotonesGeneros();
         }
 
@@ -88,20 +161,22 @@
             
             if (generosUnicos.length > 0) {
                 listaGeneros.innerHTML = `
-                    <strong>Filtrar por género:</strong>
-                    <button id="genero-todos" class="genero-btn">Todos</button>
-                    ${generosUnicos.map(genero => 
-                        `<button class="genero-btn" data-genero="${genero}">${genero}</button>`
-                    ).join('')}
+                    <strong class="block text-lg font-semibold mb-3">Filtrar por género:</strong>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="genero-btn bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors" data-genero="todos">Todos</button>
+                        ${generosUnicos.map(genero => 
+                            `<button class="genero-btn bg-[#D94A56] text-white px-4 py-2 rounded-lg hover:bg-[#b03a44] transition-colors" data-genero="${genero}">${genero}</button>`
+                        ).join('')}
+                    </div>
                 `;
                 
                 document.querySelectorAll('.genero-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const genero = this.getAttribute('data-genero');
-                        if (genero) {
-                            filtrarPorGenero(genero);
-                        } else {
+                        if (genero === "todos") {
                             mostrarPeliculas(todasLasPeliculas);
+                        } else {
+                            filtrarPorGenero(genero);
                         }
                     });
                 });
@@ -112,18 +187,26 @@
             const lista = document.getElementById("peliculas-omdb");
             
             if (peliculasAMostrar.length === 0) {
-                lista.innerHTML = "<p>No se encontraron películas.</p>";
+                lista.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-gray-600">No se encontraron películas</p>
+                    </div>
+                `;
                 return;
             }
             
             lista.innerHTML = peliculasAMostrar.map(pelicula => `
-                <div class="pelicula-card">
-                    <img src="${pelicula.Poster !== "N/A" ? pelicula.Poster : 'https://via.placeholder.com/300x450/333/fff?text=No+Imagen'}" alt="${pelicula.Title}">
-                    <div class="pelicula-info">
-                        <h2>${pelicula.Title}</h2>
-                        <p><strong>Año:</strong> ${pelicula.Year}</p>
-                        <p><strong>Director:</strong> ${pelicula.Director !== "N/A" ? pelicula.Director : 'No disponible'}</p>
-                        <p><strong>Género:</strong> ${pelicula.Genre !== "N/A" ? pelicula.Genre : 'No disponible'}</p>
+                <div class="pelicula-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl">
+                    <img 
+                        src="${pelicula.Poster !== "N/A" ? pelicula.Poster : 'https://via.placeholder.com/300x450/eee/666?text=No+Imagen'}" 
+                        alt="${pelicula.Title}"
+                        class="w-full h-64 object-cover"
+                    >
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold text-[#D94A56] mb-2">${pelicula.Title}</h2>
+                        <p class="text-gray-600 mb-1"><strong>Año:</strong> ${pelicula.Year}</p>
+                        <p class="text-gray-600 mb-1"><strong>Director:</strong> ${pelicula.Director !== "N/A" ? pelicula.Director : 'No disponible'}</p>
+                        <p class="text-gray-600"><strong>Género:</strong> ${pelicula.Genre !== "N/A" ? pelicula.Genre : 'No disponible'}</p>
                     </div>
                 </div>
             `).join('');
@@ -157,7 +240,7 @@
             
             document.getElementById('btn-generos').addEventListener('click', function() {
                 const listaGeneros = document.getElementById('lista-generos');
-                listaGeneros.style.display = listaGeneros.style.display === 'block' ? 'none' : 'block';
+                listaGeneros.classList.toggle('hidden');
             });
         });
     </script>
