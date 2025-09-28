@@ -4,39 +4,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/pelicula.css">
     <title>Películas</title>
 </head>
 
 <body>
-    <h1>Películas</h1>
-    <p>Aquí va la información sobre películas.</p>
-</body>
+    <div class="cuadro-peliculas-header">
+        <h1>Películas</h1>
+    </div>
+    <div class="filtros-barra">
+        <input type="text" id="busqueda" placeholder="Buscar por nombre...">
+        <button id="btn-generos">Géneros</button>
+    </div>
 
-<div class="peliculas-omdb" id="peliculas-omdb"></div>
+    <div id="lista-generos"></div>
 
-<script>
-    const API_KEY = "b25d9640";
-    const peliculas = ["Inception", "Interstellar", "Dunkirk", "Tenet"];
+    <div class="peliculas-contenedor" id="peliculas-omdb"> </div>
+
+    <div class="botton-container">
+        <button onclick="location.href='../index.html'">Volver al inicio</button>
+    </div>
     
-    async function cargarPeliculas(){
-        const lista = document.getElementById("peliculas-omdb");
+    <script>
+        const API_KEY = "b25d9640";
+        let todasLasPeliculas = [];
+        let generosUnicos = [];
 
-        for(const pelicula of peliculas){
-            const res = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(pelicula)}&apikey=${API_KEY}`);
-            const data = await res.json();
+        async function cargarPeliculas() {
+            const lista = document.getElementById("peliculas-omdb");
+            lista.innerHTML = "<p>Cargando películas...</p>";
 
-            lista.innerHTML += `
-                <div class="pelicula">
-                    <h2>${data.Title}</h2>
-                    <img src="${data.Poster}" alt="${data.Title}" width="200">
-                    <p><strong>Año:</strong> ${data.Year}</p>
-                    <p><strong>Director:</strong> ${data.Director}</p>
-                    <p><strong>Género:</strong> ${data.Genre}</p>
-                </div>
-            `;
+            const busquedas = ["action", "drama", "comedy", "adventure", "thriller"];
+            
+            
+            for (const termino of busquedas) {
+                const res = await fetch(`https://www.omdbapi.com/?s=${termino}&apikey=${API_KEY}`);
+                const data = await res.json();
+                
+                if (data.Response === "True") {
+                    for (const pelicula of data.Search) {
+                        const detalleRes = await fetch(`https://www.omdbapi.com/?i=${pelicula.imdbID}&apikey=${API_KEY}`);
+                        const detalleData = await detalleRes.json();
+                        
+                        if (detalleData.Response === "True") {
+                            todasLasPeliculas.push(detalleData);
+                        }
+                    }
+                }
+            }
+            
+            todasLasPeliculas = todasLasPeliculas.filter((pelicula, index, self) => 
+                index === self.findIndex(p => p.imdbID === pelicula.imdbID)
+            );
+            
+            extraerGeneros();
+            
+            mostrarPeliculas(todasLasPeliculas);
+                
+
         }
-    }
-    cargarPeliculas();
-</script>
 
+        function extraerGeneros() {
+            generosUnicos = [];
+            
+            todasLasPeliculas.forEach(pelicula => {
+                if (pelicula.Genre) {
+                    const generosPelicula = pelicula.Genre.split(", ");
+                    generosPelicula.forEach(genero => {
+                        if (!generosUnicos.includes(genero)) {
+                            generosUnicos.push(genero);
+                        }
+                    });
+                }
+            });
+            
+            generosUnicos.sort();
+            
+            mostrarBotonesGeneros();
+        }
+
+        function mostrarBotonesGeneros() {
+            const listaGeneros = document.getElementById("lista-generos");
+            
+            if (generosUnicos.length > 0) {
+                listaGeneros.innerHTML = `
+                    <strong>Filtrar por género:</strong>
+                    <button id="genero-todos" class="genero-btn">Todos</button>
+                    ${generosUnicos.map(genero => 
+                        `<button class="genero-btn" data-genero="${genero}">${genero}</button>`
+                    ).join('')}
+                `;
+                
+                document.querySelectorAll('.genero-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const genero = this.getAttribute('data-genero');
+                        if (genero) {
+                            filtrarPorGenero(genero);
+                        } else {
+                            mostrarPeliculas(todasLasPeliculas);
+                        }
+                    });
+                });
+            }
+        }
+
+        function mostrarPeliculas(peliculasAMostrar) {
+            const lista = document.getElementById("peliculas-omdb");
+            
+            if (peliculasAMostrar.length === 0) {
+                lista.innerHTML = "<p>No se encontraron películas.</p>";
+                return;
+            }
+            
+            lista.innerHTML = peliculasAMostrar.map(pelicula => `
+                <div class="pelicula-card">
+                    <img src="${pelicula.Poster !== "N/A" ? pelicula.Poster : 'https://via.placeholder.com/300x450/333/fff?text=No+Imagen'}" alt="${pelicula.Title}">
+                    <div class="pelicula-info">
+                        <h2>${pelicula.Title}</h2>
+                        <p><strong>Año:</strong> ${pelicula.Year}</p>
+                        <p><strong>Director:</strong> ${pelicula.Director !== "N/A" ? pelicula.Director : 'No disponible'}</p>
+                        <p><strong>Género:</strong> ${pelicula.Genre !== "N/A" ? pelicula.Genre : 'No disponible'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filtrarPorGenero(genero) {
+            const peliculasFiltradas = todasLasPeliculas.filter(pelicula => 
+                pelicula.Genre && pelicula.Genre.includes(genero)
+            );
+            mostrarPeliculas(peliculasFiltradas);
+        }
+
+        function buscarPorNombre() {
+            const busqueda = document.getElementById('busqueda').value.toLowerCase().trim();
+            
+            if (busqueda === '') {
+                mostrarPeliculas(todasLasPeliculas);
+                return;
+            }
+            
+            const peliculasFiltradas = todasLasPeliculas.filter(pelicula => 
+                pelicula.Title.toLowerCase().includes(busqueda)
+            );
+            mostrarPeliculas(peliculasFiltradas);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarPeliculas();
+            
+            document.getElementById('busqueda').addEventListener('input', buscarPorNombre);
+            
+            document.getElementById('btn-generos').addEventListener('click', function() {
+                const listaGeneros = document.getElementById('lista-generos');
+                listaGeneros.style.display = listaGeneros.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+    </script>
+</body>
 </html>
