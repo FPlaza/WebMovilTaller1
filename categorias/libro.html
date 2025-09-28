@@ -5,36 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Libros</title>
+    <link rel="stylesheet" href="../styles/libro.css">
 </head>
 
 <body>
     <h1>Libros</h1>
     <p>Aquí va la información sobre libros.</p>
+
+    <div class="busqueda-container">
+        <input type="text" id="busqueda" placeholder="Buscar libros por título o autor...">
+        <button onclick="buscarLibros()">Buscar</button>
+    </div>
+
+    <div class="libros-biblio" id="libros-biblio"></div>
 </body>
 
-<div class="libros-biblio" id="libros-biblio"></div>
+
 
 <script>
-    const libros = ["El Quijote", "Cien años de soledad", "Los juegos del hambre", "La casa de los espíritus"];
 
-    async function cargarLibros(){
+    async function cargarLibros() {
+        const libros = ["El Quijote", "Cien años de soledad", "Los juegos del hambre", "La casa de los espíritus"];
         const lista = document.getElementById("libros-biblio");
 
-        for(const libro of libros){
-            const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(libro)}`);
-            const data = await res.json();
-            
-            const l1 = data.docs[0];
-            lista.innerHTML += `
-                <div class="libro">
-                    <h2>${l1.title}</h2>
-                    <img src="https://covers.openlibrary.org/b/id/${l1.cover_i}-M.jpg" alt="${l1.title}" width="200">
-                    <p><strong>Autor:</strong> ${l1.author_name.join(", ")}</p>
-                    <p><strong>Año de publicación:</strong> ${l1.first_publish_year}</p>
-                </div>
-            `;
+        lista.innerHTML = "";
+
+        for (const libro of libros) {
+            try {
+                const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(libro)}&limit=1`);
+                const data = await res.json();
+
+                if (data.docs && data.docs.length > 0) {
+                    const l1 = data.docs[0];
+                    lista.innerHTML += `
+                        <div class="libro">
+                            <h2>${l1.title}</h2>
+                            <img src="https://covers.openlibrary.org/b/id/${l1.cover_i || 'default'}-M.jpg" alt="${l1.title}" width="200">
+                            <p><strong>Autor:</strong> ${l1.author_name ? l1.author_name.join(", ") : 'Autor desconocido'}</p>
+                            <p><strong>Año de publicación:</strong> ${l1.first_publish_year || 'Año desconocido'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error(`Error cargando ${libro}:`, error);
+            }
         }
     }
+
+
+    async function buscarLibros() {
+        const busqueda = document.getElementById("busqueda").value;
+
+        if (busqueda === "") {
+            cargarLibros();
+            return;
+        }
+
+        const lista = document.getElementById("libros-biblio");
+
+        lista.innerHTML = "";
+
+        try {
+            const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(busqueda)}&limit=10`);
+            const data = await res.json();
+
+            if (data.docs && data.docs.length > 0) {
+                
+                for (const libro of data.docs) {
+                    lista.innerHTML += `
+                        <div class="libro">
+                            <h2>${libro.title}</h2>
+                            <img src="https://covers.openlibrary.org/b/id/${libro.cover_i || 'default'}-M.jpg" alt="${libro.title}" width="200">
+                            <p><strong>Autor:</strong> ${libro.author_name ? libro.author_name.join(", ") : 'Autor desconocido'}</p>
+                            <p><strong>Año de publicación:</strong> ${libro.first_publish_year || 'Año desconocido'}</p>
+                        </div>
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error(`Error cargando ${busqueda}:`, error);
+        }
+    }
+
+
+
     cargarLibros();
 </script>
 
