@@ -57,7 +57,70 @@
     color: #333;
     font-size: 16px;
 }
+.botton-buscar {
+    text-align: center;
+    margin: 20px 0;
+}
 
+.filtros-barra {
+    max-width: 900px;
+    margin: 30px auto 0 auto;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.filtros-barra input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+.filtros-barra button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #D94A56;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+}
+.filtros-barra button:hover {
+    background: #b03a44;
+}
+
+#lista-generos {
+    display: none;
+    max-width: 900px;
+    margin: 10px auto 0 auto;
+    padding: 10px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+#lista-generos strong {
+    display: block;
+    margin-bottom: 8px;
+}
+.genero-btn,
+#genero-todos {
+    margin: 5px 8px 5px 0;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #D94A56;
+    color: #fff;
+    cursor: pointer;
+    font-size: 15px;
+}
+#genero-todos {
+    background: #888;
+}
+.genero-btn:hover,
+#genero-todos:hover {
+    background: #b03a44;
+}
 @media (max-width: 768px) {
     .peliculas-contenedor {
         grid-template-columns: 1fr;
