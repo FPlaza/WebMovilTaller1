@@ -5,19 +5,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Libros</title>
-    <link rel="stylesheet" href="../styles/libro.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'book-beige': '#D9BD9C',
+                        'book-gray': 'whitesmoke'
+                    },
+                    fontFamily: {
+                        'open-sans': ['Open-Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body>
-    <a href="../index.html" class="btn-volver">← Volver al menú</a>
-    <h1>Libros</h1>
+<body class="font-open-sans m-0 p-0 bg-book-gray">
+    <a href="../index.html" 
+       class="inline-block px-5 py-3 m-5 bg-book-beige text-black no-underline rounded-2xl text-base font-bold shadow-lg hover:translate-x-0.5 hover:-translate-y-0.5 transition-transform duration-700">
+        ← Volver al menú
+    </a>
+    
+    <h1 class="text-4xl md:text-5xl text-center my-5">Libros</h1>
 
-    <div class="busqueda-container">
-        <input type="text" id="busqueda" placeholder="Buscar libros por título o autor...">
-        <button onclick="buscarLibros()">Buscar</button>
+    <div class="flex flex-col md:flex-row justify-center gap-3 md:gap-4 mx-auto my-8 max-w-2xl px-4">
+        <input type="text" id="busqueda" 
+               class="flex-1 p-4 border-2 border-gray-300 rounded-2xl text-base"
+               placeholder="Buscar libros por título o autor...">
+        <button onclick="buscarLibros()" 
+                class="px-6 md:px-8 py-4 bg-book-beige border-0 rounded-2xl text-base cursor-pointer shadow-lg hover:translate-x-0.5 hover:-translate-y-0.5 transition-transform duration-700">
+            Buscar
+        </button>
     </div>
 
-    <div class="libros-biblio" id="libros-biblio"></div>
+    <div id="libros-biblio" 
+         class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto mt-12 px-4"></div>
 </body>
 
 
@@ -38,11 +63,13 @@
                 if (data.docs && data.docs.length > 0) {
                     const l1 = data.docs[0];
                     lista.innerHTML += `
-                        <div class="libro">
-                            <h2>${l1.title}</h2>
-                            <img src="https://covers.openlibrary.org/b/id/${l1.cover_i || 'default'}-M.jpg" alt="${l1.title}" width="200">
-                            <p><strong>Autor:</strong> ${l1.author_name ? l1.author_name.join(", ") : 'Autor desconocido'}</p>
-                            <p><strong>Año de publicación:</strong> ${l1.first_publish_year || 'Año desconocido'}</p>
+                        <div class="bg-white rounded-2xl p-5 text-center shadow-lg flex flex-col items-center justify-center hover:translate-x-1 hover:-translate-y-1 transition-transform duration-700">
+                            <h2 class="m-0 mb-4 text-xl md:text-2xl">${l1.title}</h2>
+                            <img src="https://covers.openlibrary.org/b/id/${l1.cover_i || 'default'}-M.jpg" 
+                                 alt="${l1.title}" 
+                                 class="rounded-xl my-4 w-full max-w-[150px] md:max-w-[200px] h-auto">
+                            <p class="my-2 text-left text-sm md:text-base"><strong>Autor:</strong> ${l1.author_name ? l1.author_name.join(", ") : 'Autor desconocido'}</p>
+                            <p class="my-2 text-left text-sm md:text-base"><strong>Año de publicación:</strong> ${l1.first_publish_year || 'Año desconocido'}</p>
                         </div>
                     `;
                 }
@@ -73,11 +100,13 @@
                 
                 for (const libro of data.docs) {
                     lista.innerHTML += `
-                        <div class="libro">
-                            <h2>${libro.title}</h2>
-                            <img src="https://covers.openlibrary.org/b/id/${libro.cover_i || 'default'}-M.jpg" alt="${libro.title}" width="200">
-                            <p><strong>Autor:</strong> ${libro.author_name ? libro.author_name.join(", ") : 'Autor desconocido'}</p>
-                            <p><strong>Año de publicación:</strong> ${libro.first_publish_year || 'Año desconocido'}</p>
+                        <div class="bg-white rounded-2xl p-5 text-center shadow-lg flex flex-col items-center justify-center hover:translate-x-1 hover:-translate-y-1 transition-transform duration-700">
+                            <h2 class="m-0 mb-4 text-xl md:text-2xl">${libro.title}</h2>
+                            <img src="https://covers.openlibrary.org/b/id/${libro.cover_i || 'default'}-M.jpg" 
+                                 alt="${libro.title}" 
+                                 class="rounded-xl my-4 w-full max-w-[150px] md:max-w-[200px] h-auto">
+                            <p class="my-2 text-left text-sm md:text-base"><strong>Autor:</strong> ${libro.author_name ? libro.author_name.join(", ") : 'Autor desconocido'}</p>
+                            <p class="my-2 text-left text-sm md:text-base"><strong>Año de publicación:</strong> ${libro.first_publish_year || 'Año desconocido'}</p>
                         </div>
                     `;
                 }
