@@ -7,71 +7,94 @@
     <title>Videojuegos - 4GEEK</title>
 </head>
 <body class="bg-gray-100 min-h-screen">
-
     <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
                 <img src="../img/4GEEK.png" alt="Logo" class="w-12 h-12">
                 <h1 class="text-2xl font-bold">4GEEK</h1>
             </div>
-            <nav class="flex space-x-4">
+            <nav>
                 <a href="../index.html" class="hover:bg-white/20 px-3 py-2 rounded transition">Inicio</a>
             </nav>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Videojuegos</h1>
-        <p class="text-lg text-center text-gray-600 mb-8">Descubre información sobre videojuegos populares</p>
+        <h1 class="text-4xl text-center my-5 font-bold text-gray-800">Videojuegos</h1>
 
-        <!-- Barra de búsqueda -->
-        <div class="flex flex-col md:flex-row justify-center gap-3 md:gap-4 mx-auto my-8 max-w-2xl px-4">
-            <input type="text" id="busqueda" 
-                   placeholder="Buscar videojuegos..." 
-                   class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="buscarVideojuegos()"
-                    class="px-6 md:px-8 py-3 bg-purple-600 text-white border-0 rounded-lg text-base cursor-pointer hover:bg-purple-700 transition-colors font-medium">
-                Buscar
-            </button>
+        <div class="flex flex-col md:flex-row gap-3 mx-auto my-8 max-w-2xl px-4">
+            <input type="text" id="busqueda" class="flex-1 p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Buscar videojuegos...">
+            <button onclick="buscarJuegos()" class="px-8 py-4 bg-blue-500 text-white rounded-2xl hover:bg-blue-600 transition font-medium">Buscar</button>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <select id="filtro-plataforma" class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todas las plataformas</option>
-                    <option value="pc">PC</option>
-                    <option value="playstation">PlayStation</option>
-                    <option value="xbox">Xbox</option>
-                    <option value="nintendo">Nintendo</option>
-                    <option value="mobile">Mobile</option>
-                </select>
-
-                <select id="filtro-genero" class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todos los géneros</option>
-                    <option value="shooter">Shooter</option>
-                    <option value="battle">Battle Royale</option>
-                    <option value="rpg">RPG</option>
-                    <option value="strategy">Estrategia</option>
-                    <option value="sports">Deportes</option>
-                </select>
-
-                <button id="btn-filtrar" class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors font-medium">
-                    Filtrar
-                </button>
-            </div>
-        </div>
-
-        <div id="cargando" class="text-center py-8">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            <p class="mt-2 text-gray-600">Cargando videojuegos...</p>
-        </div>
-
-        <div id="error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
-
-        <div id="lista-videojuegos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        </div>
+        <div id="juegos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4"></div>
     </main>
 
-    <script src="../videojuegos.js"></script>
+    <script>
+        const apiKey = 'c81ca902294f480aadbd85e1a6d5c756';
+        let todosJuegos = [];
+
+        async function cargarJuegos() {
+            const container = document.getElementById("juegos-container");
+            container.innerHTML = '<div class="col-span-3 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div><p class="mt-2">Cargando juegos...</p></div>';
+
+            try {
+                const res = await fetch(`https://api.rawg.io/api/games?key=${apiKey}&page_size=24`);
+                const data = await res.json();
+                
+                todosJuegos = data.results.map(juego => ({
+                    name: juego.name,
+                    image: juego.background_image,
+                    genre: juego.genres[0]?.name || 'Varios',
+                    rating: juego.rating || 'N/A',
+                    released: juego.released || 'Próximo'
+                }));
+
+                mostrarJuegos(todosJuegos);
+            } catch (error) {
+                console.log('Error cargando juegos:', error);
+                container.innerHTML = '<p class="col-span-3 text-center text-red-500">Error al cargar</p>';
+            }
+        }
+
+        function mostrarJuegos(juegos) {
+            const container = document.getElementById("juegos-container");
+            if (!juegos.length) {
+                container.innerHTML = '<p class="col-span-3 text-center">No hay juegos</p>';
+                return;
+            }
+
+            let html = '';
+            for (const juego of juegos) {
+                html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
+                    <img src="${juego.image || 'https://via.placeholder.com/300x200'}" alt="${juego.name}" class="rounded-xl w-full h-48 object-cover mb-4">
+                    <h2 class="text-xl font-semibold mb-2">${juego.name}</h2>
+                    <p><strong>Género:</strong> ${juego.genre}</p>
+                    <p><strong>Rating:</strong> ${juego.rating}/5</p>
+                    <p><strong>Lanzamiento:</strong> ${juego.released}</p>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function buscarJuegos() {
+            const busqueda = document.getElementById("busqueda").value.toLowerCase();
+            if (!busqueda) {
+                mostrarJuegos(todosJuegos);
+                return;
+            }
+
+            const filtrados = todosJuegos.filter(juego => 
+                juego.name.toLowerCase().includes(busqueda)
+            );
+            mostrarJuegos(filtrados);
+        }
+
+        document.getElementById('busqueda').addEventListener('keypress', e => {
+        if (e.key === 'Enter') buscarJuegos()
+        });
+
+        cargarJuegos();
+    </script>
 </body>
 </html>

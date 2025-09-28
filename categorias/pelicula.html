@@ -5,244 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Películas - 4GEEK</title>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'custom-blue': '#3B82F6',
-                        'custom-purple': '#8B5CF6'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .pelicula-card {
-            transition: all 0.3s ease;
-        }
-        
-        .pelicula-card:hover {
-            transform: translateY(-5px);
-        }
-    </style>
 </head>
-
 <body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-custom-blue to-custom-purple text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+    <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
                 <img src="../img/4GEEK.png" alt="Logo" class="w-12 h-12">
                 <h1 class="text-2xl font-bold">4GEEK</h1>
             </div>
-            <nav class="flex space-x-4">
+            <nav>
                 <a href="../index.html" class="hover:bg-white/20 px-3 py-2 rounded transition">Inicio</a>
             </nav>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">Películas</h1>
-        <p class="text-lg text-center text-gray-600 mb-8">Explora nuestro catálogo y encuentra tus películas favoritas</p>
+        <h1 class="text-4xl text-center my-5 font-bold text-gray-800">Películas</h1>
 
-        <!-- Barra de búsqueda -->
-        <div class="flex flex-col md:flex-row justify-center gap-3 md:gap-4 mx-auto my-8 max-w-2xl px-4">
-            <input 
-                type="text" 
-                id="busqueda" 
-                placeholder="Buscar por nombre..." 
-                class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-custom-blue"
-            >
-            <button 
-                onclick="buscarPorNombre()"
-                class="px-6 md:px-8 py-3 bg-custom-purple text-white border-0 rounded-lg text-base cursor-pointer hover:bg-purple-700 transition-colors font-medium"
-            >
-                Buscar
-            </button>
+        <div class="flex flex-col md:flex-row gap-3 mx-auto my-8 max-w-2xl px-4">
+            <input type="text" id="busqueda" class="flex-1 p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Buscar películas...">
+            <button onclick="buscarPeliculas()" class="px-8 py-4 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition font-medium">Buscar</button>
         </div>
 
-        <!-- Filtro de géneros -->
-        <div class="container mx-auto px-4 mt-6">
-            <div class="flex justify-center mb-6">
-                <button 
-                    id="btn-generos" 
-                    class="bg-custom-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                    Mostrar Géneros
-                </button>
-            </div>
-
-            <!-- Lista de géneros -->
-            <div id="lista-generos" class="hidden bg-white p-4 rounded-lg shadow-md mb-6">
-                <!-- Los géneros se cargarán dinámicamente -->
-            </div>
-        </div>
-
-        <!-- Contenedor de películas -->
-        <div id="peliculas-omdb" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Las películas se cargarán aquí -->
-        </div>
+        <div id="peliculas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4"></div>
     </main>
 
     <script>
         const API_KEY = "b25d9640";
-        let todasLasPeliculas = [];
-        let generosUnicos = [];
+        let todasPeliculas = [];
 
         async function cargarPeliculas() {
-            const lista = document.getElementById("peliculas-omdb");
-            lista.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-custom-blue mx-auto"></div>
-                    <p class="mt-4 text-gray-600">Cargando películas...</p>
-                </div>
-            `;
+            const container = document.getElementById("peliculas-container");
+            container.innerHTML = '<div class="col-span-3 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div><p class="mt-2">Cargando películas...</p></div>';
 
-            const busquedas = ["action", "drama", "comedy", "adventure", "thriller", "romance", "horror"];
+            const categorias = ["action", "drama", "comedy", "adventure"];
+            todasPeliculas = [];
             
-            try {
-                for (const termino of busquedas) {
-                    const res = await fetch(`https://www.omdbapi.com/?s=${termino}&apikey=${API_KEY}`);
+            for (const cat of categorias) {
+                try {
+                    const res = await fetch(`https://www.omdbapi.com/?s=${cat}&apikey=${API_KEY}`);
                     const data = await res.json();
-                    
-                    if (data.Response === "True") {
-                        for (const pelicula of data.Search.slice(0, 3)) {
-                            const detalleRes = await fetch(`https://www.omdbapi.com/?i=${pelicula.imdbID}&apikey=${API_KEY}`);
-                            const detalleData = await detalleRes.json();
-                            
+                    if (data.Search) {
+                        for (const peli of data.Search.slice(0, 2)) {
+                            const detalle = await fetch(`https://www.omdbapi.com/?i=${peli.imdbID}&apikey=${API_KEY}`);
+                            const detalleData = await detalle.json();
                             if (detalleData.Response === "True") {
-                                todasLasPeliculas.push(detalleData);
+                                todasPeliculas.push(detalleData);
                             }
                         }
                     }
+                } catch (error) {
+                    console.log(`Error con categoría ${cat}:`, error);
                 }
-                
-                todasLasPeliculas = todasLasPeliculas.filter((pelicula, index, self) => 
-                    index === self.findIndex(p => p.imdbID === pelicula.imdbID)
-                );
-                
-                extraerGeneros();
-                mostrarPeliculas(todasLasPeliculas);
-                
-            } catch (error) {
-                lista.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <p class="text-red-500">Error al cargar las películas</p>
-                    </div>
-                `;
             }
+
+            mostrarPeliculas(todasPeliculas);
         }
 
-        function extraerGeneros() {
-            generosUnicos = [];
-            
-            todasLasPeliculas.forEach(pelicula => {
-                if (pelicula.Genre) {
-                    const generosPelicula = pelicula.Genre.split(", ");
-                    generosPelicula.forEach(genero => {
-                        if (!generosUnicos.includes(genero)) {
-                            generosUnicos.push(genero);
-                        }
-                    });
-                }
-            });
-            
-            generosUnicos.sort();
-            mostrarBotonesGeneros();
-        }
-
-        function mostrarBotonesGeneros() {
-            const listaGeneros = document.getElementById("lista-generos");
-            
-            if (generosUnicos.length > 0) {
-                listaGeneros.innerHTML = `
-                    <strong class="block text-lg font-semibold mb-3 text-center">Filtrar por género:</strong>
-                    <div class="flex flex-wrap gap-2 justify-center">
-                        <button class="genero-btn bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors" data-genero="todos">Todos</button>
-                        ${generosUnicos.map(genero => 
-                            `<button class="genero-btn bg-custom-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" data-genero="${genero}">${genero}</button>`
-                        ).join('')}
-                    </div>
-                `;
-                
-                document.querySelectorAll('.genero-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const genero = this.getAttribute('data-genero');
-                        if (genero === "todos") {
-                            mostrarPeliculas(todasLasPeliculas);
-                        } else {
-                            filtrarPorGenero(genero);
-                        }
-                    });
-                });
-            }
-        }
-
-        function mostrarPeliculas(peliculasAMostrar) {
-            const lista = document.getElementById("peliculas-omdb");
-            
-            if (peliculasAMostrar.length === 0) {
-                lista.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <p class="text-gray-600">No se encontraron películas</p>
-                    </div>
-                `;
+        function mostrarPeliculas(peliculas) {
+            const container = document.getElementById("peliculas-container");
+            if (!peliculas.length) {
+                container.innerHTML = '<p class="col-span-3 text-center">No hay películas</p>';
                 return;
             }
-            
-            lista.innerHTML = peliculasAMostrar.map(pelicula => `
-                <div class="pelicula-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl">
-                    <img 
-                        src="${pelicula.Poster !== "N/A" ? pelicula.Poster : 'https://via.placeholder.com/300x450/eee/666?text=No+Imagen'}" 
-                        alt="${pelicula.Title}"
-                        class="w-full h-64 object-cover"
-                    >
-                    <div class="p-4">
-                        <h2 class="text-xl font-bold text-gray-800 mb-2">${pelicula.Title}</h2>
-                        <p class="text-gray-600 mb-1"><strong>Año:</strong> ${pelicula.Year}</p>
-                        <p class="text-gray-600 mb-1"><strong>Director:</strong> ${pelicula.Director !== "N/A" ? pelicula.Director : 'No disponible'}</p>
-                        <p class="text-gray-600"><strong>Género:</strong> ${pelicula.Genre !== "N/A" ? pelicula.Genre : 'No disponible'}</p>
-                    </div>
-                </div>
-            `).join('');
+
+            let html = '';
+            for (const peli of peliculas) {
+                html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
+                    <img src="${peli.Poster !== "N/A" ? peli.Poster : 'https://via.placeholder.com/300x450/eee/666?text=No+Imagen'}" alt="${peli.Title}" class="rounded-xl w-full h-64 object-cover mb-4">
+                    <h2 class="text-xl font-semibold mb-2">${peli.Title}</h2>
+                    <p><strong>Año:</strong> ${peli.Year}</p>
+                    <p><strong>Director:</strong> ${peli.Director !== "N/A" ? peli.Director : 'N/A'}</p>
+                    <p><strong>Género:</strong> ${peli.Genre !== "N/A" ? peli.Genre : 'N/A'}</p>
+                </div>`;
+            }
+            container.innerHTML = html;
         }
 
-        function filtrarPorGenero(genero) {
-            const peliculasFiltradas = todasLasPeliculas.filter(pelicula => 
-                pelicula.Genre && pelicula.Genre.includes(genero)
-            );
-            mostrarPeliculas(peliculasFiltradas);
-        }
-
-        function buscarPorNombre() {
-            const busqueda = document.getElementById('busqueda').value.toLowerCase().trim();
-            
-            if (busqueda === '') {
-                mostrarPeliculas(todasLasPeliculas);
+        function buscarPeliculas() {
+            const busqueda = document.getElementById("busqueda").value.toLowerCase();
+            if (!busqueda) {
+                mostrarPeliculas(todasPeliculas);
                 return;
             }
-            
-            const peliculasFiltradas = todasLasPeliculas.filter(pelicula => 
-                pelicula.Title.toLowerCase().includes(busqueda)
-            );
-            mostrarPeliculas(peliculasFiltradas);
-        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            cargarPeliculas();
-            
-            document.getElementById('busqueda').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    buscarPorNombre();
-                }
-            });
-            
-            document.getElementById('btn-generos').addEventListener('click', function() {
-                const listaGeneros = document.getElementById('lista-generos');
-                listaGeneros.classList.toggle('hidden');
-            });
-        });
+            const filtradas = todasPeliculas.filter(peli => 
+                peli.Title.toLowerCase().includes(busqueda)
+            );
+            mostrarPeliculas(filtradas);
+        }
+        document.getElementById('busqueda').addEventListener('input', buscarPeliculas
+        );
+
+        cargarPeliculas();
     </script>
 </body>
 </html>
