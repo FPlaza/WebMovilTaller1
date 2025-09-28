@@ -1,64 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/index.css">
-    <title>Taller 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>4GEEK - InfoMóvil</title>
 </head>
-
-<body>
-    <div class="cuadro-inicio">
-        <div class="logo">
-            <img src="img/4GEEK.png" alt="Logo">
-            <h1>4GEEK</h1>
-        </div>
-        <div class="enlaces">
-            <nav>
-                <a href="#">Página principal</a>
-                <a href="#">Contacto</a>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                <img src="img/4GEEK.png" alt="Logo" class="w-12 h-12">
+                <h1 class="text-2xl font-bold">4GEEK</h1>
+            </div>
+            <nav class="flex space-x-4">
+                <a href="#" class="hover:bg-white/20 px-3 py-2 rounded transition">Inicio</a>
+                <a href="#" class="hover:bg-white/20 px-3 py-2 rounded transition">Contacto</a>
             </nav>
         </div>
-    </div>
+    </header>
 
-    <div class="contenedor-categorias">
-        <div class="cuadro-videojuegos">
-            <img src="img/videojuegos.jpg" alt="Videojuegos">
-            <div class="info-videojuegos">
-                <h2>Videojuegos</h2>
-                <p>Agregar pequeña descripción.</p>
-                <a href="categorias/videojuego.html">Ver más</a>
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Explora Nuestras Categorías</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="img/videojuegos.jpg" alt="Videojuegos" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Videojuegos</h3>
+                    <p class="text-gray-600 mb-4">Descubre los mejores juegos gratuitos y sus detalles.</p>
+                    <a href="categorias/videojuego.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Explorar</a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="img/musica.jpg" alt="Música" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Música</h3>
+                    <p class="text-gray-600 mb-4">Encuentra información sobre artistas y álbumes.</p>
+                    <a href="categorias/musica.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Explorar</a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="img/peliculas.jpg" alt="Películas" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Películas</h3>
+                    <p class="text-gray-600 mb-4">Información detallada de películas populares.</p>
+                    <a href="categorias/pelicula.html" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Explorar</a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="img/libros.jpg" alt="Libros" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Libros</h3>
+                    <p class="text-gray-600 mb-4">Explora libros y autores populares.</p>
+                    <a href="categorias/libro.html" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Explorar</a>
+                </div>
             </div>
         </div>
-
-        <div class="cuadro-musica">
-            <img src="img/musica.jpg" alt="Musica">
-            <div class="info-musica">
-                <h2>Música</h2>
-                <p>Agregar pequeña descripción.</p>
-                <a href="categorias/musica.html">Ver más</a>
-            </div>
-        </div>
-
-        <div class="cuadro-peliculas">
-            <img src="img/peliculas.jpg" alt="Películas">
-            <div class="info-peliculas">
-                <h2>Películas</h2>
-                <p>Agregar pequeña descripción.</p>
-                <a href="categorias/pelicula.html">Ver más</a>
-            </div>
-        </div>
-
-        <div class="cuadro-libros">
-            <img src="img/libros.jpg" alt="Libros">
-            <div class="info-libros">
-                <h2>Libros</h2>
-                <p>Agregar pequeña descripción.</p>
-                <a href="categorias/libro.html">Ver más</a>
-            </div>
-        </div>
-    </div>
+    </main>
 </body>
-
 </html>
