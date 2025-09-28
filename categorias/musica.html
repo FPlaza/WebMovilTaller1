@@ -5,25 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Música</title>
-    <link rel="stylesheet" href="../styles/musica.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="musica-info">
-        <div class="musica-titulo">
-            <h1>TOP MÚSICA</h1>
-        </div>
-        <div class="volver">
-            <a href="../index.html">Página principal</a>
+<body class="bg-gray-900 text-white font-sans text-center">
+    <div class="bg-pink-700 py-6">
+        <h1 class="text-3xl font-bold">TOP MÚSICA</h1>
+        <div class="mt-2">
+            <a href="../index.html"
+                class="inline-block bg-purple-700 px-4 py-2 rounded hover:bg-purple-800 transition">Página principal</a>
         </div>
     </div>
 
-    <div class="contenedor-busqueda">
-        <input type="text" id="busqueda" placeholder="Buscar artistas...">
-        <button onclick="buscarArtistas()">Buscar</button>
+    <div class="my-6 flex justify-center gap-2">
+        <input id="busqueda" type="text" placeholder="Buscar artistas..."
+            class="px-3 py-2 rounded focus:outline-none text-black w-64">
+        <button onclick="buscarArtistas()"
+            class="bg-purple-700 px-4 py-2 rounded hover:bg-purple-800 transition">Buscar</button>
     </div>
 
-    <div class="contenedor-artistas" id="contenedor-artistas"></div>
+    <div id="contenedor-artistas" class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-5xl mx-auto mb-10"></div>
 
     <script>
         async function cargarArtistas() {
@@ -41,14 +42,14 @@
 
                 const a = data.artists[0];
                 contenedor.innerHTML += `
-                <div class="cuadro-artista">
+                <div class="bg-purple-800 rounded-lg overflow-hidden text-center transform hover:translate-x-1 hover:-translate-y-1 transition cursor-pointer">
                     <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${a.strArtist}">
-                    <div class="info-artista">
-                    <h2>${a.strArtist}</h2>
-                    <p>Género: ${a.strGenre || 'Desconocido'}</p>
-                    </div>
+                    <div class="p-4">
+                <h2 class="text-xl font-semibold">${a.strArtist}</h2>
+                <p class="mt-1">Género: ${a.strGenre}</p>
+              </div>
                 </div>
-                `;           
+                `;
             }
         }
 
