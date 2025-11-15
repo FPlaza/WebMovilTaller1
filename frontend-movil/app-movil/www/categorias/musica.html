@@ -66,7 +66,7 @@
             contenedor.innerHTML = '<div class="col-span-4 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div><p class="mt-2">Buscando...</p></div>';
 
             try {
-                const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${busqueda}`);
+                const res = await fetch(`http://localhost:3000/music/artists?search=${artista}`);
                 const data = await res.json();
                 
                 let html = '';
