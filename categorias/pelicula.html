@@ -31,36 +31,32 @@
     </main>
 
     <script>
-        const API_KEY = "b25d9640";
+        const FASTAPI_URL = "http://127.0.0.1:8000";
         let todasPeliculas = [];
 
         async function cargarPeliculas() {
             const container = document.getElementById("peliculas-container");
-            container.innerHTML = '<div class="col-span-3 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div><p class="mt-2">Cargando películas...</p></div>';
+            container.innerHTML = '...Cargando películas de la DB...'; 
 
-            const categorias = ["action", "drama", "comedy", "adventure"];
-            todasPeliculas = [];
-            
-            for (const cat of categorias) {
-                try {
-                    const res = await fetch(`https://www.omdbapi.com/?s=${cat}&apikey=${API_KEY}`);
-                    const data = await res.json();
-                    if (data.Search) {
-                        for (const peli of data.Search.slice(0, 2)) {
-                            const detalle = await fetch(`https://www.omdbapi.com/?i=${peli.imdbID}&apikey=${API_KEY}`);
-                            const detalleData = await detalle.json();
-                            if (detalleData.Response === "True") {
-                                todasPeliculas.push(detalleData);
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.log(`Error con categoría ${cat}:`, error);
+            try {
+                const res = await fetch(`${FASTAPI_URL}/movies/`);
+                
+                if (!res.ok) {
+                    throw new Error(`Error HTTP: ${res.status}`);
                 }
+                
+                todasPeliculas = await res.json(); 
+                
+            } catch (error) {
+                console.error("Error al cargar las películas de FastAPI:", error);
+                container.innerHTML = '<p class="col-span-3 text-center text-red-600">Error al conectar con el servidor.</p>';
+                return;
             }
 
             mostrarPeliculas(todasPeliculas);
         }
+
+       cargarPeliculas();
 
         function mostrarPeliculas(peliculas) {
             const container = document.getElementById("peliculas-container");
@@ -71,12 +67,15 @@
 
             let html = '';
             for (const peli of peliculas) {
+                const imageUrl = peli.poster_url && peli.poster_url !== "N/A" 
+                     ? peli.poster_url 
+                     : 'https://via.placeholder.com/300x450/eee/666?text=No+Imagen';
                 html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
-                    <img src="${peli.Poster !== "N/A" ? peli.Poster : 'https://via.placeholder.com/300x450/eee/666?text=No+Imagen'}" alt="${peli.Title}" class="rounded-xl w-full h-64 object-cover mb-4">
-                    <h2 class="text-xl font-semibold mb-2">${peli.Title}</h2>
-                    <p><strong>Año:</strong> ${peli.Year}</p>
-                    <p><strong>Director:</strong> ${peli.Director !== "N/A" ? peli.Director : 'N/A'}</p>
-                    <p><strong>Género:</strong> ${peli.Genre !== "N/A" ? peli.Genre : 'N/A'}</p>
+                    <img src="${imageUrl}" alt="${peli.title}" class="rounded-xl w-full h-64 object-cover mb-4">
+                    <h2 class="text-xl font-semibold mb-2">${peli.title}</h2>
+                    <p><strong>Año:</strong> ${peli.release_date}</p>
+                    <p><strong>Director:</strong> ${peli.director !== "N/A" ? peli.director : 'N/A'}</p>
+                    <p><strong>Género:</strong> ${peli.genre !== "N/A" ? peli.genre : 'N/A'}</p>
                 </div>`;
             }
             container.innerHTML = html;
@@ -90,7 +89,7 @@
             }
 
             const filtradas = todasPeliculas.filter(peli => 
-                peli.Title.toLowerCase().includes(busqueda)
+                peli.title.toLowerCase().includes(busqueda)
             );
             mostrarPeliculas(filtradas);
         }
