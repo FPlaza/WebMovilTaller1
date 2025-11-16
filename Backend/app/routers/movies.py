@@ -2,6 +2,7 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import List
 
 from ..database import get_db
 from ..models import Movie
