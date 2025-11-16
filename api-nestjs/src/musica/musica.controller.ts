@@ -12,9 +12,9 @@ export class MusicaController {
     return this.musicaService.fetchAndSaveArtists();
   }
 
-  @Get(':id')
-  getArtistById(@Param('id') id: string) {
-    return this.musicaService.findOne(id);
+  @Get('artists')
+  searchArtists(@Query('search') search: string) {
+    return this.musicaService.searchArtists(search);
   }
 
   @Get()
@@ -22,8 +22,8 @@ export class MusicaController {
     return this.musicaService.findAll();
   }
 
-  @Get('artists')
-  searchArtists(@Query('search') search: string) {
-    return this.musicaService.searchArtists(search);
+  @Get(':id')
+  getArtistById(@Param('id') id: string) {
+    return this.musicaService.findOne(id);
   }
 }

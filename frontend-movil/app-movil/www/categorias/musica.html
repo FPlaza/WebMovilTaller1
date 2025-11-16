@@ -57,7 +57,7 @@
                     <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200/eee/666?text=Sin+imagen'}" 
                          class="rounded-xl w-full h-48 object-cover mb-4">
                     <h2 class="text-xl font-semibold mb-2">${a.strArtist}</h2>
-                    <p><strong>Género:</strong> ${a.strGenre || 'N/A'}</p>
+                    <p><strong>Género:</strong> ${a.strGender || 'N/A'}</p>
                     <p><strong>País:</strong> ${a.strCountry || 'N/A'}</p>
                 </div>`;
                 });
@@ -84,13 +84,15 @@
                 <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200/eee/666?text=Sin+imagen'}"
                      class="rounded-xl w-full h-48 object-cover mb-4">
                 <h2 class="text-xl font-semibold mb-2">${a.strArtist}</h2>
-                <p><strong>Género:</strong> ${a.strGenre || 'N/A'}</p>
+                <p><strong>Género:</strong> ${a.strGender || 'N/A'}</p>
                 <p><strong>País:</strong> ${a.strCountry || 'N/A'}</p>
             </div>`;
             });
 
             contenedor.innerHTML = html || "<p class='col-span-4 text-center'>No hay resultados</p>";
         }
+
+        cargarArtistas();
 
     </script>
 </body>

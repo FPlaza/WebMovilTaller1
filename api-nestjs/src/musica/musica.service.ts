@@ -65,9 +65,7 @@ export class MusicaService {
 
     return this.artistRepo.find({
       where: [
-        { strArtist: ILike(`%${search}%`) },
-        { strCountry: ILike(`%${search}%`) },
-        { strGender: ILike(`%${search}%`) }
+        { strArtist: ILike(`%${search}%`) }
       ]
     });
   }
