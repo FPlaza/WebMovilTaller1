@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MusicController } from './music/music.controller';
-import { HttpModule } from '@nestjs/axios';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { MusicaModule } from './musica/musica.module';
 
 @Module({
-  imports: [HttpModule],
-  controllers: [MusicController],
+  imports: [MusicaModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
