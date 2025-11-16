@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Música - 4GEEK</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 min-h-screen">
     <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -23,73 +25,74 @@
         <h1 class="text-4xl text-center my-5 font-bold text-gray-800">Música</h1>
 
         <div class="flex flex-col md:flex-row gap-3 mx-auto my-8 max-w-2xl px-4">
-            <input type="text" id="busqueda" class="flex-1 p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Buscar artistas...">
-            <button onclick="buscarArtistas()" class="px-8 py-4 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition font-medium">Buscar</button>
+            <input type="text" id="busqueda"
+                class="flex-1 p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Buscar artistas...">
+            <button onclick="buscarArtistas()"
+                class="px-8 py-4 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition font-medium">Buscar</button>
         </div>
 
-        <div id="contenedor-artistas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto px-4"></div>
+        <div id="contenedor-artistas"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto px-4"></div>
     </main>
 
     <script>
-        const artistas = ["The Beatles", "Queen", "Michael Jackson", "Madonna", "Elton John", "David Bowie", "Prince", "Whitney Houston", "Bob Marley", "Rolling Stones", "Pink Floyd", "Coldplay", "Adele", "Taylor Swift", "Ed Sheeran", "Bruno Mars"];
-
         async function cargarArtistas() {
             const contenedor = document.getElementById("contenedor-artistas");
-            contenedor.innerHTML = '<div class="col-span-4 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div><p class="mt-2">Cargando artistas...</p></div>';
+            contenedor.innerHTML = `
+        <div class="col-span-4 text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <p class="mt-2">Cargando artistas...</p>
+        </div>
+    `;
 
-            let html = '';
-            for (const artista of artistas) {
-                try {
-                    const res = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${artista}`);
-                    const data = await res.json();
-                    if (data.artists && data.artists[0]) {
-                        const a = data.artists[0];
-                        html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
-                            <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200/eee/666?text=Sin+imagen'}" alt="${a.strArtist}" class="rounded-xl w-full h-48 object-cover mb-4">
-                            <h2 class="text-xl font-semibold mb-2">${a.strArtist}</h2>
-                            <p><strong>Género:</strong> ${a.strGenre || 'N/A'}</p>
-                            <p><strong>País:</strong> ${a.strCountry || 'N/A'}</p>
-                        </div>`;
-                    }
-                } catch (error) {
-                    console.log(`Error con ${artista}:`, error);
-                }
+            try {
+                const res = await fetch("http://localhost:3000/musica");
+                const artistas = await res.json();
+
+                let html = "";
+                artistas.forEach(a => {
+                    html += `
+                <div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
+                    <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200/eee/666?text=Sin+imagen'}" 
+                         class="rounded-xl w-full h-48 object-cover mb-4">
+                    <h2 class="text-xl font-semibold mb-2">${a.strArtist}</h2>
+                    <p><strong>Género:</strong> ${a.strGenre || 'N/A'}</p>
+                    <p><strong>País:</strong> ${a.strCountry || 'N/A'}</p>
+                </div>`;
+                });
+
+                contenedor.innerHTML = html;
+            } catch (e) {
+                contenedor.innerHTML = '<p class="col-span-4 text-center text-red-500">Error cargando artistas</p>';
             }
-            contenedor.innerHTML = html;
         }
 
         async function buscarArtistas() {
             const busqueda = document.getElementById("busqueda").value;
-            if (!busqueda) { cargarArtistas(); return; }
 
             const contenedor = document.getElementById("contenedor-artistas");
-            contenedor.innerHTML = '<div class="col-span-4 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div><p class="mt-2">Buscando...</p></div>';
+            contenedor.innerHTML = "Buscando...";
 
-            try {
-                const res = await fetch(`http://localhost:3000/music/artists?search=${artista}`);
-                const data = await res.json();
-                
-                let html = '';
-                if (data.artists) {
-                    for (const artista of data.artists.slice(0, 16)) {
-                        html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
-                            <img src="${artista.strArtistThumb || 'https://via.placeholder.com/300x200/eee/666?text=Sin+imagen'}" alt="${artista.strArtist}" class="rounded-xl w-full h-48 object-cover mb-4">
-                            <h2 class="text-xl font-semibold mb-2">${artista.strArtist}</h2>
-                            <p><strong>Género:</strong> ${artista.strGenre || 'N/A'}</p>
-                            <p><strong>País:</strong> ${artista.strCountry || 'N/A'}</p>
-                        </div>`;
-                    }
-                }
-                contenedor.innerHTML = html || '<p class="col-span-4 text-center">No hay resultados</p>';
-            } catch (error) {
-                contenedor.innerHTML = '<p class="col-span-4 text-center text-red-500">Error en la búsqueda</p>';
-            }
+            const res = await fetch(`http://localhost:3000/musica/artists?search=${busqueda}`);
+            const artistas = await res.json();
+
+            let html = "";
+            artistas.forEach(a => {
+                html += `
+            <div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
+                <img src="${a.strArtistThumb || 'https://via.placeholder.com/300x200/eee/666?text=Sin+imagen'}"
+                     class="rounded-xl w-full h-48 object-cover mb-4">
+                <h2 class="text-xl font-semibold mb-2">${a.strArtist}</h2>
+                <p><strong>Género:</strong> ${a.strGenre || 'N/A'}</p>
+                <p><strong>País:</strong> ${a.strCountry || 'N/A'}</p>
+            </div>`;
+            });
+
+            contenedor.innerHTML = html || "<p class='col-span-4 text-center'>No hay resultados</p>";
         }
-        document.getElementById('busqueda').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') buscarArtistas()
-        });
 
-        cargarArtistas();
     </script>
 </body>
+
 </html>

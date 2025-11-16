@@ -1,34 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MusicaService } from './musica.service';
 import { CreateMusicaDto } from './dto/create-musica.dto';
 import { UpdateMusicaDto } from './dto/update-musica.dto';
 
 @Controller('musica')
 export class MusicaController {
-  constructor(private readonly musicaService: MusicaService) {}
+  constructor(private readonly musicaService: MusicaService) { }
 
-  @Post()
-  create(@Body() createMusicaDto: CreateMusicaDto) {
-    return this.musicaService.create(createMusicaDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.musicaService.findAll();
+  @Post('fetch-and-save')
+  fetchAndSaveArtists() {
+    return this.musicaService.fetchAndSaveArtists();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.musicaService.findOne(+id);
+  getArtistById(@Param('id') id: string) {
+    return this.musicaService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMusicaDto: UpdateMusicaDto) {
-    return this.musicaService.update(+id, updateMusicaDto);
+  @Get()
+  getAllArtists() {
+    return this.musicaService.findAll();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.musicaService.remove(+id);
+  @Get('artists')
+  searchArtists(@Query('search') search: string) {
+    return this.musicaService.searchArtists(search);
   }
 }
