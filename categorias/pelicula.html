@@ -70,10 +70,11 @@
                 const imageUrl = peli.poster_url && peli.poster_url !== "N/A" 
                      ? peli.poster_url 
                      : 'https://via.placeholder.com/300x450/eee/666?text=No+Imagen';
+                const anio = peli.release_date ? peli.release_date.split('-')[0] : 'N/A';
                 html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
                     <img src="${imageUrl}" alt="${peli.title}" class="rounded-xl w-full h-64 object-cover mb-4">
                     <h2 class="text-xl font-semibold mb-2">${peli.title}</h2>
-                    <p><strong>Año:</strong> ${peli.release_date}</p>
+                    <p><strong>Año:</strong> ${anio}</p>
                     <p><strong>Director:</strong> ${peli.director !== "N/A" ? peli.director : 'N/A'}</p>
                     <p><strong>Género:</strong> ${peli.genre !== "N/A" ? peli.genre : 'N/A'}</p>
                 </div>`;
