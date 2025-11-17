@@ -83,3 +83,4 @@ POST http://localhost:8000/movies/populate
 - Música
 
 **Se utilizó como base de datos PostgreSQL. Los datos de acceso a la base de datos se encuentran en api-nest\docker-compose.yml.
+**La aplicación (apk) se generó con con la versión que obtenía los datos directamente desde la API en el frontend. De esta forma se evita la dependencia de las bases de datos locales y servidores locales generados para el Taller 2.
