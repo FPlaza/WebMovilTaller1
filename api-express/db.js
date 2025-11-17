@@ -4,8 +4,8 @@ const pool = new Pool({
     host: "localhost",
     port: 5432,
     user: "postgres",
-    password: "12345", // tu password real
-    database: "musica_db" // la misma DB que usa NestJS
+    password: "12345", 
+    database: "musica_db"
 });
 
 module.exports = pool;

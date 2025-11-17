@@ -13,7 +13,7 @@ class MovieBase(BaseModel):
     poster_url: Optional[str] = None
 
 class MovieResponse(MovieBase):
-    id: int # ID de nuestra DB
+    id: int
 
     class Config:
         orm_mode = True
