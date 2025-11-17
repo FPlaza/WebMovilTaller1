@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Libros - 4GEEK</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 min-h-screen">
     <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -23,11 +25,15 @@
         <h1 class="text-4xl text-center my-5 font-bold text-gray-800">Libros</h1>
 
         <div class="flex flex-col md:flex-row gap-3 mx-auto my-8 max-w-2xl px-4">
-            <input type="text" id="busqueda" class="flex-1 p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Buscar libros...">
-            <button onclick="buscarLibros()" class="px-8 py-4 bg-yellow-500 text-white rounded-2xl hover:bg-yellow-600 transition font-medium">Buscar</button>
+            <input type="text" id="busqueda"
+                class="flex-1 p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="Buscar libros...">
+            <button onclick="buscarLibros()"
+                class="px-8 py-4 bg-yellow-500 text-white rounded-2xl hover:bg-yellow-600 transition font-medium">Buscar</button>
         </div>
 
-        <div id="libros-biblio" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4"></div>
+        <div id="libros-biblio" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+        </div>
     </main>
 
     <script>
@@ -37,54 +43,56 @@
             const lista = document.getElementById("libros-biblio");
             lista.innerHTML = '<div class="col-span-3 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div><p class="mt-2">Cargando libros...</p></div>';
 
-            let html = '';
-            for (const libro of libros) {
-                try {
-                    const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(libro)}&limit=1`);
-                    const data = await res.json();
-                    if (data.docs[0]) {
-                        const l = data.docs[0];
-                        html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
-                            <h2 class="text-xl font-semibold mb-4">${l.title}</h2>
-                            <img src="https://covers.openlibrary.org/b/id/${l.cover_i || 'default'}-M.jpg" alt="${l.title}" class="rounded-xl my-4 w-48 mx-auto">
-                            <p><strong>Autor:</strong> ${l.author_name ? l.author_name.join(", ") : 'Desconocido'}</p>
-                            <p><strong>Año:</strong> ${l.first_publish_year || '?'}</p>
-                        </div>`;
-                    }
-                } catch (error) {
-                    console.log(`Error con ${libro}:`, error);
-                }
+            try {
+                const res = await fetch("http://localhost:3001/libros");
+                const data = await res.json();
+
+                let html = "";
+                data.forEach(l => {
+                    html += `
+                <div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
+                    <h2 class="text-xl font-semibold mb-4">${l.titulo}</h2>
+                    <p><strong>Autor:</strong> ${l.autor}</p>
+                    <p><strong>Año:</strong> ${l.anio}</p>
+                </div>`;
+                });
+
+                lista.innerHTML = html;
+
+            } catch (error) {
+                lista.innerHTML = '<p class="col-span-3 text-center text-red-500">Error cargando libros desde el backend</p>';
             }
-            lista.innerHTML = html;
         }
+
 
         async function buscarLibros() {
             const busqueda = document.getElementById("busqueda").value;
-            if (!busqueda) { cargarLibros(); return; }
 
             const lista = document.getElementById("libros-biblio");
             lista.innerHTML = '<div class="col-span-3 text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div><p class="mt-2">Buscando...</p></div>';
 
             try {
-                const res = await fetch(`http://localhost:3001/books?search=${libro}`);
+                const res = await fetch(`http://localhost:3001/libros-busqueda?search=${encodeURIComponent(busqueda)}`);
+
                 const data = await res.json();
-                
-                let html = '';
-                if (data.docs) {
-                    for (const libro of data.docs.slice(0, 12)) {
-                        html += `<div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
-                            <h2 class="text-xl font-semibold mb-4">${libro.title}</h2>
-                            <img src="https://covers.openlibrary.org/b/id/${libro.cover_i || 'default'}-M.jpg" alt="${libro.title}" class="rounded-xl my-4 w-48 mx-auto">
-                            <p><strong>Autor:</strong> ${libro.author_name ? libro.author_name.join(", ") : 'Desconocido'}</p>
-                            <p><strong>Año:</strong> ${libro.first_publish_year || '?'}</p>
-                        </div>`;
-                    }
-                }
+
+                let html = "";
+                data.forEach(l => {
+                    html += `
+                <div class="bg-white rounded-2xl p-5 shadow-lg hover:translate-y-1 transition border">
+                    <h2 class="text-xl font-semibold mb-4">${l.titulo}</h2>
+                    <p><strong>Autor:</strong> ${l.autor}</p>
+                    <p><strong>Año:</strong> ${l.anio}</p>
+                </div>`;
+                });
+
                 lista.innerHTML = html || '<p class="col-span-3 text-center">No hay resultados</p>';
+
             } catch (error) {
                 lista.innerHTML = '<p class="col-span-3 text-center text-red-500">Error en la búsqueda</p>';
             }
         }
+
 
         document.getElementById('busqueda').addEventListener('keypress', e => {
             if (e.key === 'Enter') buscarLibros();
@@ -93,4 +101,5 @@
         cargarLibros();
     </script>
 </body>
+
 </html>
